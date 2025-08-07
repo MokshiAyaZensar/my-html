@@ -1,25 +1,30 @@
 name: Deploy to Humanitec
+
 on:
   push:
     branches:
       - main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Deploy to Humanitec
         run: |
-          curl -X POST https://app.humanitec.io/orgs/zensar/apps/html-web/envs/dev/deploys \
-          -H "Authorization: Bearer ${{ secrets.HUMANITEC_TOKEN }}" \
-          -H "Content-Type: application/json" \
-          -d '{
-                "env_id": "dev",
-                "artifacts": {
-                  "app": {
-                    "image": "registry.humanitec.io/public/sample-app"
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST https://app.humanitec.io/orgs/zensar/apps/html-web/envs/dev/deploys \
+            -H "Authorization: Bearer ${{ secrets.HUMANITEC_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+                  "env_id": "dev",
+                  "artifacts": {
+                    "app": {
+                      "image": "registry.humanitec.io/public/sample-app"
+                    }
                   }
-                }
-              }'
+                }')
+          echo "Response from Humanitec:"
+          echo "$RESPONSE"
